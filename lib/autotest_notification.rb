@@ -9,11 +9,12 @@ module AutotestNotification
 
     class << self
       attr_reader :images_directory
-      attr_accessor :success_image, :fail_image, :pending_image, :expiration_in_seconds
+      attr_accessor :success_image, :fail_image, :pending_image, :error_image, :expiration_in_seconds
 
       def images_directory=(path)
         @images_directory = File.expand_path(path)
 
+        @error_image = "#{@images_directory}/error.png"
         @success_image = "#{@images_directory}/pass.png"
         @fail_image    = "#{@images_directory}/fail.png"
         @pending_image = "#{@images_directory}/pending.png"
@@ -27,8 +28,6 @@ module AutotestNotification
   end
 
   Autotest.add_hook :ran_command do |at|
-    lines = autotest.results.map { |s| s.gsub(/(\e.*?m|\n)/, '') }   # remove escape sequences
-    lines.reject! { |line| !line.match(/\d+\s+(example|test|scenario|step)s?/) }   # isolate result numbers
     
     lines.each do |line|
       %w{ test assertion error example pending failure }.each { |x| instance_variable_set "@#{x}s", line[/(\d+) #{x}/, 1].to_i }
@@ -46,7 +45,9 @@ module AutotestNotification
       @failures = 1
     end
 
-    if @failures > 0 || @errors > 0
+    if @errors > 0
+        notify "Errorz!!!", msg, Config.error_image, @tests + @examples, @failures + @errors, 2
+    elsif @failures > 0
       notify "FAIL", msg, Config.fail_image, @tests + @examples, @failures + @errors, 2
     elsif PENDING && @pendings > 0
       notify "Pending", msg, Config.pending_image, @tests + @examples, @failures + @errors, 1
@@ -92,6 +93,8 @@ module AutotestNotification
 
       img = Doom.image(total, failures) if DOOM_EDITION
       img = Buuf.image(title.downcase) if BUUF
+      img = Fuuu.image(title.downcase) if FUUU
+
 
       case RUBY_PLATFORM
       when /linux/
@@ -124,7 +127,7 @@ module AutotestNotification
   end
 end
 
-%w{ linux mac windows cygwin doom buuf }.each { |x| require "autotest_notification/#{x}" }
+%w{ linux mac windows cygwin doom buuf fuuu }.each { |x| require "autotest_notification/#{x}" }
 
 if RUBY_PLATFORM == 'java'
   require 'java'

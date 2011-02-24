@@ -7,6 +7,7 @@ class TestMac < Test::Unit::TestCase
     AutotestNotification.const_set :SPEAKING, false
     AutotestNotification.const_set :STICKY, false
     AutotestNotification.const_set :BUUF, false
+    AutotestNotification.const_set :FUUU, false
     AutotestNotification.const_set :SUCCESS_SOUND, ''
     AutotestNotification.const_set :FAILURE_SOUND, ''
     AutotestNotification::Mac.stubs(:system)
@@ -68,6 +69,12 @@ class TestMac < Test::Unit::TestCase
   
   def test_notify_with_buuf
     AutotestNotification.const_set :BUUF, true
+    AutotestNotification::Mac.expects(:system).with("growlnotify -n autotest --image image -p 0 -m 'msg' -t title")
+    AutotestNotification::Mac.notify("title", "msg", "image", 1, 1)
+  end
+
+  def test_notify_with_fuuu
+    AutotestNotification.const_set :FUUU, true
     AutotestNotification::Mac.expects(:system).with("growlnotify -n autotest --image image -p 0 -m 'msg' -t title")
     AutotestNotification::Mac.notify("title", "msg", "image", 1, 1)
   end

@@ -10,7 +10,7 @@ class TestAutotestNotification < Test::Unit::TestCase
     @total    = 0
     @failures = 0
     
-    %w( DOOM_EDITION SPEAKING STICKY BUUF ).each do |c|
+    %w( DOOM_EDITION SPEAKING STICKY BUUF FUUU ).each do |c|
       AutotestNotification.const_set(c.to_sym, false) unless AutotestNotification.const_defined?(c.to_sym)
     end
   end

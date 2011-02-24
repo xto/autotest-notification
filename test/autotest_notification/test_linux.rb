@@ -8,6 +8,7 @@ class TestLinux < Test::Unit::TestCase
     AutotestNotification.const_set :SPEAKING, false
     AutotestNotification.const_set :STICKY, false
     AutotestNotification.const_set :BUUF, false
+    AutotestNotification.const_set :FUUU, false
   end
 
   def test_notify_when_use_notify_without_speak
